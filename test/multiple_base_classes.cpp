@@ -26,6 +26,4 @@ int main(){
 	if(pb == 0){
 		cout << "pb is casted to zero" << endl;		//can be normally operated
 	}
-	
-
 }
