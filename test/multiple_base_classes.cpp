@@ -12,18 +12,17 @@ public:
 };
 
 class C:public A, public B{
-
+    int c;
 };
 
 int main(){
-	
 	C* pc = 0;
 	B* pb = 0;
-	if(pb == 0){
-		cout << "pb is assigned to zero" << endl;
-	}
+	cout << "pc is assigned to " << (uint64_t)pc << endl;
 	pb = pc;		//pb = (pc == 0)?0:(B*)((char*)pc + delta(B));
-	if(pb == 0){
-		cout << "pb is casted to zero" << endl;		//can be normally operated
-	}
+	cout << "pb is casted to " << (uint64_t)pb << endl;		//can be normally operated
+	pc = (C*)0xffff;
+	cout << "pc is assigned to " << hex << (uint64_t)pc << endl;
+	pb = pc;
+	cout << "pb is casted to " << (uint64_t)pb << endl;
 }
