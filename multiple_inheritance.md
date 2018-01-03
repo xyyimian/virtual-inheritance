@@ -1,4 +1,4 @@
-## C++的多重继承的定义
+## C++的多重继承实现机制
 
 ### 内存分布
 给定两个类：
@@ -124,3 +124,90 @@ pb = pc;		//pb = (pc == 0)?0:(B*)((char*)pc + delta(B));
 if(pb == 0){...}
 ```
 这样又会增加复杂度和运行时时间
+
+### 虚函数
+
+* 内存模型
+
+当成员函数为虚函数时，考虑下面的例子
+
+```
+class A{ virtual void f(); };
+class B{ virtual void f(); virtual void g(); };
+class : A, B{void f();};
+A* pa = new C();
+B* pb = new C();
+C* pc = new C();
+pa->f();
+pb->f();
+pc->f();
+```
+
+`pa`,`pb`,`pc`在调用f()时，都应该是调用`C::f()`。
+
+然而，当pb调用f()时，编译器无法知晓当前的指针pb是指向一个类型为C的对象或是类型为B的对象，因此不能单纯地减去常数delta(B)。我们需要存储delta(B)，而由于只有调用虚函数时需要用到delta(B)，将其存储在vtbl(table of virtual functions)是最佳的。
+
+vbtl的条目结构如下：
+
+```c++
+struct vbtl_entry{
+  	void (*fct)();		//function pointer
+  	int delta;
+};
+```
+
+C的内存模型如下：
+
+```
+--------------
+|			|			vtbl:
+|	vptr	---------->	----------------
+|	A part	|			| C::f	|	0	|
+|			|			----------------
+--------------
+|			|
+|	vptr	---------->	-----------------
+|	B part	|			|C::f	|-delta(B)|
+|			|			|B::g	|	0	|
+--------------			-------------------
+|	C part	|
+--------------
+```
+
+调用pb->f()时，相当于
+
+```c++
+pb->f();			//call C::f
+//vtbl_entry* vt = pb->vptr[index(f)];
+//(*vt->fct)((B*)((chat*)pb+vt->delta))
+```
+
+可以看到，对象C中对象B的vtbl和单纯的对象B对应的vtbl是不一样的。此时我们需要为每一个基类和当前派生类分配一个vtbl。
+
+* 二义性
+
+考虑这样一个例子
+
+```c++
+class A{virtual void f();};
+class B{virtual void f();};
+class C : A, B{void f();};
+C* pc = new C;
+pc->f();
+```
+
+若需要调用基类的虚函数，需显示地声明函数命名空间，此时命名空间会压制`virtual`的表达。例如：`pc->A::f()`，`pc->B::f()`。
+
+若需要调用派生类自己`override`的函数，直接调用`pc->f()`是无二义的。如果派生类未定义自己的函数，那么此时需加上命名空间消除二义性。例如：
+
+```c++
+class A{virtual void f();};
+class B{virtual void f();};
+class C: A, B{};
+
+C* pc = new C;
+pc->f();				//error, ambiguous
+A* pa = pc;
+pa->f();				//not ambiguous, calls A::f()
+```
+

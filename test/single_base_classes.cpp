@@ -28,19 +28,20 @@ int main()
     A a;
     B b;
     C c;
-    uint64_t a_vptr_address =*((uint64_t*)&a);      //address of vptr a
-    uint64_t b_vptr_address =*((uint64_t*)&b);      //address of vptr b
-    uint64_t c_vptr_address =*((uint64_t*)&c);      //address of vptr c
-    uint64_t* a_vptr = (uint64_t*)a_vptr_address;
-    uint64_t* b_vptr = (uint64_t*)b_vptr_address;
-    uint64_t* c_vptr = (uint64_t*)c_vptr_address;
-    cout << "A func f:" << a_vptr[0] << endl;
-    cout << "B func f:" << b_vptr[0] << endl;
-    cout << "C func f:" << c_vptr[0] << endl;
-    cout << "A func g:" << a_vptr[1] << endl;
-    cout << "B func g:" << b_vptr[1] << endl;
-    cout << "C func g:" << c_vptr[1] << endl;
-    cout << "A func h:" << a_vptr[2] << endl;
-    cout << "B func h:" << b_vptr[2] << endl;
-    cout << "C func h:" << c_vptr[2] << endl;
+    uint32_t a_vptr_address =*((uint32_t*)&a);      //address of vptr a
+    uint32_t b_vptr_address =*((uint32_t*)&b);      //address of vptr b
+    uint32_t c_vptr_address =*((uint32_t*)&c);      //address of vptr c
+    uint32_t* a_vptr = (uint32_t*)a_vptr_address;
+    uint32_t* b_vptr = (uint32_t*)b_vptr_address;
+    uint32_t* c_vptr = (uint32_t*)c_vptr_address;
+    cout << std::hex;
+    cout << "A func f: 0x" << a_vptr[0] << endl;
+    cout << "B func f: 0x" << b_vptr[0] << endl;
+    cout << "C func f: 0x" << c_vptr[0] << endl;
+    cout << "A func g: 0x" << a_vptr[1] << endl;
+    cout << "B func g: 0x" << b_vptr[1] << endl;
+    cout << "C func g: 0x" << c_vptr[1] << endl;
+    cout << "A func h: 0x" << a_vptr[2] << endl;
+    cout << "B func h: 0x" << b_vptr[2] << endl;
+    cout << "C func h: 0x" << c_vptr[2] << endl;
 }
